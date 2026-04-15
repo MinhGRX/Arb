@@ -1,0 +1,46 @@
+{
+  "name": "arb",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "npx ts-node src/index.ts",
+    "server": "npx ts-node src/server.ts",
+    "client": "npx ts-node src/client.ts",
+    "live": "npx ts-node src/live.ts",
+    "test:pinnacle": "npx ts-node src/adapters/test-pinnacle.ts",
+    "test:live": "npx ts-node src/adapters/test-live.ts",
+    "build": "tsc",
+    "start": "node dist/live.js",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MinhGRX/Arb.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/MinhGRX/Arb/issues"
+  },
+  "homepage": "https://github.com/MinhGRX/Arb#readme",
+  "devDependencies": {
+    "@types/cheerio": "^0.22.35",
+    "@types/dotenv": "^6.1.1",
+    "@types/node": "^25.6.0",
+    "@types/node-fetch": "^2.6.13",
+    "@types/ws": "^8.18.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.2"
+  },
+  "dependencies": {
+    "axios": "^1.15.0",
+    "cheerio": "^1.2.0",
+    "dotenv": "^17.4.2",
+    "node-fetch": "^3.3.2",
+    "ws": "^8.20.0"
+  }
+}
