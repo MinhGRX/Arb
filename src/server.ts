@@ -2,6 +2,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import http from "http";
 import { ArbEngine } from "./engine";
 import { OddsUpdate, ArbOpportunity, EngineConfig, DEFAULT_CONFIG } from "./types";
+import { OpportunityLogger } from "./logger";
 
 // ─── Config ──────────────────────────────────────────────────────────────────
 
@@ -16,6 +17,7 @@ const ENGINE_CONFIG: Partial<EngineConfig> = {
 // ─── Engine ──────────────────────────────────────────────────────────────────
 
 const engine = new ArbEngine(ENGINE_CONFIG);
+const logger = new OpportunityLogger();
 
 // ─── Stats ───────────────────────────────────────────────────────────────────
 
@@ -29,7 +31,7 @@ let stats = {
 
 // ─── HTTP Server (health check) ──────────────────────────────────────────────
 
-const httpServer = http.createServer((req, res) => {
+const httpServer = http.createServer(async (req, res) => {
   if (req.url === "/health") {
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify({
@@ -40,6 +42,14 @@ const httpServer = http.createServer((req, res) => {
     }));
     return;
   }
+  
+  if (req.url === "/history") {
+    const recent = await logger.getRecent(100);
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(recent));
+    return;
+  }
+
   res.writeHead(404);
   res.end("Not found");
 });
@@ -76,6 +86,7 @@ wss.on("connection", (ws, req) => {
           if (opps.length > 0) {
             stats.arbsDetected += opps.length;
             broadcastArbs(opps);
+            logger.log(opps);
           }
         }
       } catch (err) {

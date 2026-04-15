@@ -28,6 +28,13 @@ const SPORT_KEY_GROUPS: Record<string, string[]> = {
     "basketball_nba",
     "basketball_euroleague",
   ],
+  esports: [
+    "esports_csgo",
+    "esports_dota2",
+    "esports_lol",
+    "esports_generic",
+    "esports_valorant",
+  ],
   tennis: ["tennis_atp_french_open"],
   americanfootball: ["americanfootball_nfl"],
   baseball: ["baseball_mlb"],

@@ -9,6 +9,7 @@ import {
   SabaAdapter,
   BaseAdapter,
 } from "./adapters";
+import { OpportunityLogger } from "./logger";
 
 // ─── Load Config from .env ────────────────────────────────────────────────────
 
@@ -22,14 +23,17 @@ const ENGINE_CONFIG: Partial<EngineConfig> = {
 };
 
 const parseSports = (env?: string) =>
-  (env || "soccer").split(",").map((s) => s.trim()).filter(Boolean);
+  (env || "soccer,basketball,esports").split(",").map((s) => s.trim()).filter(Boolean);
 
 const parseList = (env?: string): string[] =>
   env ? env.split(",").map((s) => s.trim()).filter(Boolean) : [];
 
+const LEAGUE_NAME_FILTER = parseList(process.env.LEAGUE_NAME_FILTER);
+
 // ─── Engine ───────────────────────────────────────────────────────────────────
 
 const engine = new ArbEngine(ENGINE_CONFIG);
+const logger = new OpportunityLogger();
 
 // ─── Stats ────────────────────────────────────────────────────────────────────
 
@@ -50,6 +54,7 @@ function onOdds(updates: OddsUpdate[]): void {
     if (opps.length > 0) {
       stats.arbsDetected += opps.length;
       broadcastArbs(opps);
+      logger.log(opps);
       logOpps(opps);
     }
   }
@@ -66,6 +71,7 @@ if (process.env.PINNACLE_ENABLED !== "false") {
         sports: parseSports(process.env.PINNACLE_SPORTS),
         pollIntervalMs: parseInt(process.env.PINNACLE_POLL_MS || "3000", 10),
         leagueIds: leagueIds.length ? leagueIds : undefined,
+        leagueNameFilter: LEAGUE_NAME_FILTER.length ? LEAGUE_NAME_FILTER : undefined,
       },
       onOdds
     )

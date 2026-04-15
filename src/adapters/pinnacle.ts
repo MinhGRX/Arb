@@ -7,6 +7,7 @@ import { BaseAdapter, AdapterConfig, OddsCallback } from "./base";
 export const PINNACLE_SPORT_IDS: Record<string, number> = {
   soccer: 29,
   basketball: 4,
+  esports: 12,
   tennis: 33,
   americanfootball: 15,
   baseball: 3,
@@ -87,21 +88,29 @@ export class PinnacleAdapter extends BaseAdapter {
 
   private async fetchSport(sportId: number, sport: string): Promise<OddsUpdate[]> {
     // Step 1: Get league list
-    const leaguesRes = await axios.get<Array<{ id: number; matchupCount: number }>>(
+    const leaguesRes = await axios.get<Array<{ id: number; name: string; matchupCount: number }>>(
       `${this.BASE}/sports/${sportId}/leagues?all=false&brandId=0`,
       { headers: this.HEADERS, timeout: 8000 }
     );
 
-    // Filter / sort leagues
+    // Initial filter: must have matchups
     let leagues = leaguesRes.data.filter((l) => l.matchupCount > 0);
+    
+    // Filter by ID if provided
     if (this.config.leagueIds?.length) {
       leagues = leagues.filter((l) => this.config.leagueIds!.includes(String(l.id)));
-    } else {
-      // Top leagues by matchup count
-      leagues = leagues.sort((a, b) => b.matchupCount - a.matchupCount).slice(0, 8);
+    } 
+    // Filter by Name Keywords if provided
+    else if (this.config.leagueNameFilter?.length) {
+      const keywords = this.config.leagueNameFilter.map(k => k.toLowerCase());
+      leagues = leagues.filter((l) => 
+        keywords.some(k => l.name.toLowerCase().includes(k))
+      );
     }
-
-    if (leagues.length === 0) return [];
+    // Otherwise take top 10 (expanded from 8 to catch more matches)
+    else {
+      leagues = leagues.sort((a, b) => b.matchupCount - a.matchupCount).slice(0, 10);
+    }
 
     // Step 2: Fetch matchups + markets in parallel per league
     const results = await Promise.allSettled(

@@ -6,6 +6,8 @@ export interface AdapterConfig {
   sports: string[];
   /** Leagues/competitions to filter, empty = all */
   leagueIds?: string[];
+  /** Keywords to filter leagues by name (e.g. ['lol', 'cs2']) */
+  leagueNameFilter?: string[];
 }
 
 export type OddsCallback = (updates: OddsUpdate[]) => void;

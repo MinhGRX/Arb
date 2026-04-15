@@ -102,17 +102,11 @@ The server exposes two WebSocket endpoints and one HTTP health check.
 
 ### `GET /health`
 
-```json
-{
-  "status": "ok",
-  "uptime_s": 42,
-  "store_size": 12,
-  "updatesReceived": 150,
-  "arbsDetected": 7,
-  "feedClients": 1,
-  "subClients": 2
-}
-```
+Returns server stats, store size, and uptime.
+
+### `GET /history`
+
+Returns the last 100 detected arbitrage opportunities from the persistent log.
 
 ---
 
