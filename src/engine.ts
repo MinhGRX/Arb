@@ -56,6 +56,7 @@ export class ArbEngine {
       trigger.match_id,
       trigger.market,
       trigger.line,
+      trigger.period || 0,
       this.config.staleThresholdMs
     );
 
@@ -135,6 +136,7 @@ export class ArbEngine {
       match: side1.match_id,
       market: side1.market,
       line: side1.line,
+      period: side1.period || 0,
       sharp_bookmaker: sharp.bookmaker,
       asian_bookmaker: asian.bookmaker,
       sharp_odds: { [sharp.outcome]: sharp.odds },
@@ -184,6 +186,7 @@ export class ArbEngine {
             match: h.match_id,
             market: h.market,
             line: h.line,
+            period: h.period || 0,
             sharp_bookmaker: sharp.bookmaker,
             asian_bookmaker: asian.bookmaker,
             sharp_odds: legs

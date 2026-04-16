@@ -47,11 +47,11 @@ export class OddsStore {
   }
 
   /**
-   * Retrieve all non-stale odds for a given match + market + line.
+   * Retrieve all non-stale odds for a given match + market + line + period.
    */
-  getGroup(matchId: string, market: string, line: number, staleMs: number): OddsUpdate[] {
+  getGroup(matchId: string, market: string, line: number, period: number, staleMs: number): OddsUpdate[] {
     const now = Date.now();
-    const gk = `${this.normalize(matchId)}::${market}::${line}`;
+    const gk = `${this.normalize(matchId)}::${market}::${line}::${period}`;
     const keys = this.groupIndex.get(gk);
     if (!keys) return [];
 
@@ -92,11 +92,11 @@ export class OddsStore {
   // ─── Internals ───────────────────────────────────────────────────────────
 
   private compositeKey(u: OddsUpdate): string {
-    return `${this.normalize(u.match_id)}::${u.market}::${u.line}::${u.bookmaker}::${u.outcome}`;
+    return `${this.normalize(u.match_id)}::${u.market}::${u.line}::${u.period || 0}::${u.bookmaker}::${u.outcome}`;
   }
 
   private groupKey(u: OddsUpdate): string {
-    return `${this.normalize(u.match_id)}::${u.market}::${u.line}`;
+    return `${this.normalize(u.match_id)}::${u.market}::${u.line}::${u.period || 0}`;
   }
 
   private normalize(name: string): string {

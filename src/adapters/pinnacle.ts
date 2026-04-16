@@ -53,9 +53,8 @@ export class PinnacleAdapter extends BaseAdapter {
     "X-Device-UUID": "guest",
     "Accept": "application/json",
     "Referer": "https://www.pinnacle.com/",
-    "User-Agent":
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 " +
-      "(KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    "Origin": "https://www.pinnacle.com",
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36",
   };
 
   constructor(config: AdapterConfig, onOdds: OddsCallback) {
@@ -154,8 +153,8 @@ export class PinnacleAdapter extends BaseAdapter {
     const now = Date.now();
 
     for (const mkt of markets) {
-      // Full-match only, open, non-alternate
-      if (mkt.period !== 0 || mkt.status !== "open" || mkt.isAlternate) continue;
+      // Open, non-alternate
+      if (mkt.status !== "open" || mkt.isAlternate) continue;
 
       const matchup = matchupMap.get(mkt.matchupId);
       if (!matchup) continue;
@@ -168,7 +167,7 @@ export class PinnacleAdapter extends BaseAdapter {
         for (const price of mkt.prices) {
           const dec = americanToDecimal(price.price);
           if (dec <= 1) continue;
-          updates.push(this.makeUpdate(matchId, sport, "1x2", 0, price.designation, dec, now));
+          updates.push(this.makeUpdate(matchId, sport, "1x2", 0, price.designation, dec, now, mkt.period));
         }
       }
 
@@ -177,7 +176,7 @@ export class PinnacleAdapter extends BaseAdapter {
           const line = price.points ?? 0;
           const dec = americanToDecimal(price.price);
           if (dec <= 1) continue;
-          updates.push(this.makeUpdate(matchId, sport, "over_under", line, price.designation, dec, now));
+          updates.push(this.makeUpdate(matchId, sport, "over_under", line, price.designation, dec, now, mkt.period));
         }
       }
 
@@ -186,7 +185,7 @@ export class PinnacleAdapter extends BaseAdapter {
           const line = price.points ?? 0;
           const dec = americanToDecimal(price.price);
           if (dec <= 1) continue;
-          updates.push(this.makeUpdate(matchId, sport, "handicap", line, price.designation, dec, now));
+          updates.push(this.makeUpdate(matchId, sport, "handicap", line, price.designation, dec, now, mkt.period));
         }
       }
     }
@@ -197,9 +196,9 @@ export class PinnacleAdapter extends BaseAdapter {
   private makeUpdate(
     matchId: string, sport: string,
     market: "1x2" | "over_under" | "handicap",
-    line: number, outcome: string, odds: number, timestamp: number
+    line: number, outcome: string, odds: number, timestamp: number, period: number
   ): OddsUpdate {
-    return { match_id: matchId, sport, market, line, bookmaker: this.bookmakerName, source_type: "SHARP", outcome, odds, timestamp };
+    return { match_id: matchId, sport, market, line, bookmaker: this.bookmakerName, source_type: "SHARP", outcome, odds, timestamp, period };
   }
 
   private countMatches(updates: OddsUpdate[]): number {

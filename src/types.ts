@@ -20,9 +20,11 @@ export interface OddsUpdate {
   line: number;
   bookmaker: string;
   source_type: SourceType;
-  outcome: string; // home | away | draw | over | under
+  outcome: string; // home | away | draw | over | under | team1 | team2
   odds: number;
   timestamp: number; // epoch ms
+  /** Additional context: 0 = Full match, 1 = Map 1/Period 1, etc. */
+  period?: number;
 }
 
 // ─── Detected Opportunity ────────────────────────────────────────────────────
@@ -31,6 +33,7 @@ export interface ArbOpportunity {
   match: string;
   market: MarketType;
   line: number;
+  period: number; // Defaults to 0
   sharp_bookmaker: string;
   asian_bookmaker: string;
   sharp_odds: Record<string, number>;   // outcome -> odds
